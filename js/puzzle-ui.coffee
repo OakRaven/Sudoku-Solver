@@ -65,4 +65,11 @@ define ['jquery'], ($) ->
       $('#grid').on 'mouseleave', 'table', (e) =>
         @unhighlight()
 
+      $('#grid').on 'keypress', 'input', (e) =>
+        keyPressed = String.fromCharCode(e.keyCode)
+        if $.inArray(keyPressed, ['1', '2', '3', '4', '5', '6', '7', '8', '9']) is -1
+          e.preventDefault()
+
+
+
 
