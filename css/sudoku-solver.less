@@ -1,4 +1,10 @@
-@cell-size: 40px;
+@cell-size:       50px;
+@grid-color:      #333;
+@grid-font-size:  14pt;
+
+.highlight {
+  background-color: lighten(@grid-color, 70%);
+}
 
 .container {
   width: 500px;
@@ -11,27 +17,47 @@ div#grid {
   margin-right: auto;
 
   table {
-    border:         2px solid #333;
+    border:         2px solid @grid-color;
 
     td {
       text-align:     center;
       vertical-align: center;
       width:          @cell-size;
       height:         @cell-size;
+      border:         1px solid lighten(@grid-color, 50%);
+      cursor:         pointer;
+
+      input {
+        width:        15px;
+        margin:       0;
+        display:      none;
+        border:       none;
+        font-size:    @grid-font-size;
+      }
+
+      span {
+        font-size:    @grid-font-size;
+        color:        blue;
+        display:      inline;
+      }
+
+      &.selected-cell {
+        input {
+          display:    inline;
+        }
+        span {
+          display:    none;
+        }
+      }
     }
 
     td:nth-child(3), td:nth-child(6) {
-      border-right:  2px solid #333;
+      border-right:  2px solid @grid-color;
     }
 
     tr:nth-child(3) td, tr:nth-child(6) td {
-      border-bottom:  2px solid #333;
+      border-bottom:  2px solid @grid-color;
     }
-  }
-
-  input[type=text] {
-    width:          10px;
-    margin:         0;
   }
 
   #solve-btn {
