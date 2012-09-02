@@ -1,6 +1,9 @@
-require(['jquery', 'cs!sudoku-solver'], function($, SudokuSolver){
+require(['jquery', 'cs!sudoku-solver', 'cs!puzzle-ui'], function($, SudokuSolver, Ui){
   $(function(){
-    var solver = new SudokuSolver();
-    solver.alert();
+    var
+      solver =  new SudokuSolver(),
+      ui =      new Ui();
+
+      ui.initializeBoard();
   });
 });

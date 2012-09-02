@@ -1,5 +1,5 @@
 # Sudoku Solver
 define ->
-  class @SudokuSolver
+  class SudokuSolver
     alert: ->
       console.log "alerting..."

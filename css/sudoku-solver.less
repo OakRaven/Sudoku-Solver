@@ -1,21 +1,37 @@
+@cell-size: 40px;
+
+.container {
+  width: 500px;
+}
+
 div#grid {
-  text-align: center;
+  margin-top:   2em;
+  width:        @cell-size * 9;
+  margin-left:  auto;
+  margin-right: auto;
 
   table {
-    margin-left:    auto;
-    margin-right:   auto;
+    border:         2px solid #333;
+
+    td {
+      text-align:     center;
+      vertical-align: center;
+      width:          @cell-size;
+      height:         @cell-size;
+    }
+
+    td:nth-child(3), td:nth-child(6) {
+      border-right:  2px solid #333;
+    }
+
+    tr:nth-child(3) td, tr:nth-child(6) td {
+      border-bottom:  2px solid #333;
+    }
   }
 
   input[type=text] {
     width:          10px;
     margin:         0;
-  }
-
-  td {
-    text-align:     center;
-    vertical-align: center;
-    width:          40px;
-    height:         40px;
   }
 
   #solve-btn {
