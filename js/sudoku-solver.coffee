@@ -2,4 +2,4 @@
 define ->
   class @SudokuSolver
     alert: ->
-      alert "Welcome!"
+      console.log "alerting..."
