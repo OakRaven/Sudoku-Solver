@@ -1,5 +1,6 @@
-require(['jquery'], function($){
+require(['jquery', 'cs!sudoku-solver'], function($, SudokuSolver){
   $(function(){
-    alert('hello');
+    var solver = new SudokuSolver();
+    solver.alert();
   });
 });
