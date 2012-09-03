@@ -39,6 +39,10 @@ div#grid {
         font-size:    @grid-font-size;
         color:        blue;
         display:      inline;
+
+        &.solved {
+          color:      red;
+        }
       }
 
       &.selected-cell {
@@ -60,7 +64,7 @@ div#grid {
     }
   }
 
-  #solve-btn {
+  a.btn {
     margin-top:     20px;
   }
 }

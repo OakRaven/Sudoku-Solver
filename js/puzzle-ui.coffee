@@ -1,5 +1,5 @@
 # puzzle-ui.coffee
-define ['jquery'], ($) ->
+define ['jquery', 'cs!sudoku-solver'], ($, Solver) ->
 
   class PuzzleUi
 
@@ -50,7 +50,33 @@ define ['jquery'], ($) ->
 
       if @currentlySelectedRow
         $(@currentlySelectedRow).removeClass 'highlight' 
-      
+
+
+    extractGridValues: ->
+      values = []
+      $.each $('#grid tr'), (rowIndex, rowPuzzle) ->
+        row = []
+        $.each $(rowPuzzle).find('td'), (colIndex, cellPuzzle) ->
+          $span = $(cellPuzzle).find('span')
+          row.push parseInt($span.text().trim()) || 0
+        values.push row
+      values
+
+
+    pushSolution: (result) ->
+      $.each result, (rowIndex, rowSolution) ->
+        $tr = $('#grid tr:nth-child(' + (rowIndex + 1) + ')')
+        $.each result[rowIndex], (colIndex, cellValue) ->
+          $td = $($tr).find('td:nth-child(' + (colIndex + 1) + ')')
+          $span = $($td).find('span')
+          $input = $($td).find('input')
+
+          value = $span.text()
+          if value is ''
+            $span.text cellValue
+            $span.addClass 'solved'
+            $input.val cellValue
+
 
     initializeBoard: ->
       $('#grid').on 'mouseenter', 'tr', (e) =>
@@ -69,6 +95,14 @@ define ['jquery'], ($) ->
         keyPressed = String.fromCharCode(e.keyCode)
         if $.inArray(keyPressed, ['1', '2', '3', '4', '5', '6', '7', '8', '9']) is -1
           e.preventDefault()
+
+      $('#solve-btn').on 'click', (e) => 
+        gridValues = @extractGridValues()
+        solver = new Solver()
+        result = solver.solve gridValues
+        @pushSolution result
+        $('#solve-btn').hide()
+        $('#new-btn').show()
 
 
 
