@@ -1,0 +1,55 @@
+.highlight {
+  background-color: #e5e5e5;
+}
+.container {
+  width: 500px;
+}
+div#grid {
+  margin-top: 2em;
+  width: 450px;
+  margin-left: auto;
+  margin-right: auto;
+}
+div#grid table {
+  border: 2px solid #333333;
+}
+div#grid table td {
+  text-align: center;
+  vertical-align: center;
+  width: 50px;
+  height: 50px;
+  border: 1px solid #b3b3b3;
+  cursor: pointer;
+}
+div#grid table td input {
+  width: 15px;
+  margin: 0;
+  display: none;
+  border: none;
+  font-size: 16pt;
+}
+div#grid table td span {
+  font-size: 20pt;
+  color: blue;
+  display: inline;
+}
+div#grid table td span.solved {
+  color: red;
+}
+div#grid table td.selected-cell input {
+  display: inline;
+}
+div#grid table td.selected-cell span {
+  display: none;
+}
+div#grid table td:nth-child(3),
+div#grid table td:nth-child(6) {
+  border-right: 2px solid #333333;
+}
+div#grid table tr:nth-child(3) td,
+div#grid table tr:nth-child(6) td {
+  border-bottom: 2px solid #333333;
+}
+div#grid a.btn {
+  margin-top: 20px;
+}
