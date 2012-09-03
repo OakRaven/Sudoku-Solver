@@ -7,6 +7,28 @@ define ['jquery', 'cs!sudoku-solver'], ($, Solver) ->
       @currentlySelectedRow  = null
       @currentlySelectedCol  = null
       @currentlySelectedCell = null
+      @samplePuzzle = [
+        [0,0,0,0,0,0,7,4,0],
+        [0,0,1,0,0,5,3,0,2],
+        [0,3,4,7,0,0,0,5,6],
+        [0,0,7,0,2,0,0,6,0],
+        [0,0,0,9,0,3,0,0,0],
+        [0,1,0,0,4,0,2,0,0],
+        [5,4,0,0,0,7,9,2,0],
+        [1,0,6,3,0,0,5,0,0],
+        [0,7,8,0,0,0,0,0,0]
+        ]
+      @emptyPuzzle = [
+        [0,0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0,0]
+        ]
 
 
     highlightRow: (row) ->
@@ -74,8 +96,23 @@ define ['jquery', 'cs!sudoku-solver'], ($, Solver) ->
           value = $span.text()
           if value is ''
             $span.text cellValue
-            $span.addClass 'solved'
+            $span.addClass('solved')
             $input.val cellValue
+
+    presetBoard: (puzzle) ->
+      $.each $('#grid tr'), (rowIndex, rowPuzzle) ->
+        $.each $(rowPuzzle).find('td'), (colIndex, cellPuzzle) ->
+          value = puzzle[rowIndex][colIndex]
+          $input = $(cellPuzzle).find('input')
+          $span = $(cellPuzzle).find('span')
+          $span.removeClass 'solved'
+
+          if value > 0
+            $input.val value
+            $span.text(puzzle[rowIndex][colIndex])
+          else
+            $input.val ''
+            $span.text ''
 
 
     initializeBoard: ->
@@ -97,13 +134,19 @@ define ['jquery', 'cs!sudoku-solver'], ($, Solver) ->
           e.preventDefault()
 
       $('#solve-btn').on 'click', (e) => 
+        e.preventDefault()
         gridValues = @extractGridValues()
         solver = new Solver()
         result = solver.solve gridValues
         @pushSolution result
-        $('#solve-btn').hide()
-        $('#new-btn').show()
 
 
+      $('#sample-btn').on 'click', (e) =>
+        e.preventDefault()
+        @presetBoard @samplePuzzle
+
+      $('#clear-btn').on 'click', (e) =>
+        e.preventDefault()
+        @presetBoard @emptyPuzzle
 
 
