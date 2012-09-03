@@ -5,6 +5,7 @@ class @PuzzleUi
     @currentlySelectedRow  = null
     @currentlySelectedCol  = null
     @currentlySelectedCell = null
+
     @samplePuzzle = [
       [0,0,0,0,0,0,7,4,0],
       [0,0,1,0,0,5,3,0,2],
@@ -16,6 +17,7 @@ class @PuzzleUi
       [1,0,6,3,0,0,5,0,0],
       [0,7,8,0,0,0,0,0,0]
       ]
+
     @emptyPuzzle = [
       [0,0,0,0,0,0,0,0,0],
       [0,0,0,0,0,0,0,0,0],
@@ -83,37 +85,67 @@ class @PuzzleUi
     values
 
 
-  pushSolution: (result) ->
-    $.each result, (rowIndex, rowSolution) ->
-      $tr = $('#grid tr:nth-child(' + (rowIndex + 1) + ')')
-      $.each result[rowIndex], (colIndex, cellValue) ->
-        $td = $($tr).find('td:nth-child(' + (colIndex + 1) + ')')
-        $span = $($td).find('span')
-        $input = $($td).find('input')
+  set: (row, col, num, cssclass = null) ->
+    $row = $('#grid tr:nth-child(' + (row + 1) + ')')
+    $col = $($row).find('td:nth-child(' + (col + 1) + ')')
 
-        value = $span.text()
-        if value is ''
-          $span.text cellValue
-          $span.addClass('solved')
-          $input.val cellValue
+    $span = $($col).find('span')
+    $input = $($col).find('input')
+
+    if $span.text() is ''
+      $span.addClass cssclass if cssclass
+      $span.text num
+      $input.val num
+      $col.effect('highlight', {}, 1500) if cssclass
+
+
+  clear_board: ->
+    $('#grid td input').val('')
+    $('#grid td span').text('')
+    $('#grid td span').removeClass 'solved'
+
+
+  pushSolution: (result) ->
+    $('#grid td span').removeClass 'solved'
+    rowIndex = 0
+
+    for row in result
+      colIndex = 0
+      for col in row
+        value = result[rowIndex][colIndex]
+        cssclass = 'solved' ? value > 0 : null
+        @set(rowIndex, colIndex, value, cssclass) if value
+        colIndex += 1
+
+      rowIndex += 1
+
 
   presetBoard: (puzzle) ->
-    $.each $('#grid tr'), (rowIndex, rowPuzzle) ->
-      $.each $(rowPuzzle).find('td'), (colIndex, cellPuzzle) ->
-        value = puzzle[rowIndex][colIndex]
-        $input = $(cellPuzzle).find('input')
-        $span = $(cellPuzzle).find('span')
-        $span.removeClass 'solved'
+    @clear_board()
+    rowIndex = 0
 
-        if value > 0
-          $input.val value
-          $span.text(puzzle[rowIndex][colIndex])
-        else
-          $input.val ''
-          $span.text ''
+    for row in puzzle
+      colIndex = 0
+      for col in row
+        value = puzzle[rowIndex][colIndex]
+        @set(rowIndex, colIndex, value) if value
+        colIndex += 1
+
+      rowIndex += 1
+
+
+  hide_alert: ->
+    $('#alert-panel').hide()
+
+
+  show_alert: ->
+    $('#alert-panel').show()
 
 
   initializeBoard: ->
+    $('#alert-panel .close').on 'click', =>
+      @hide_alert()
+
     $('#grid').on 'mouseenter', 'tr', (e) =>
       @highlightRow $(e.currentTarget)
 
@@ -134,10 +166,12 @@ class @PuzzleUi
     $('#solve-btn').on 'click', (e) => 
       e.preventDefault()
       gridValues = @extractGridValues()
-      solver = new SudokuSolver()
-      result = solver.solve gridValues
-      @pushSolution result
-
+      solver = new SudokuSolver(gridValues)
+      if solver.is_valid_puzzle()
+        result = solver.solve()
+        @pushSolution result
+      else
+        @show_alert()
 
     $('#sample-btn').on 'click', (e) =>
       e.preventDefault()
@@ -146,5 +180,15 @@ class @PuzzleUi
     $('#clear-btn').on 'click', (e) =>
       e.preventDefault()
       @presetBoard @emptyPuzzle
+
+    $('#hint-btn').on 'click', (e) =>
+      e.preventDefault()
+      gridValues = @extractGridValues()
+      solver = new SudokuSolver(gridValues)
+      if solver.is_valid_puzzle()
+        hint = solver.get_hint()
+        @set(hint.row, hint.column, hint.value, 'solved') if hint
+      else
+        @show_alert()
 
 

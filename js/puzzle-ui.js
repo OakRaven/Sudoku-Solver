@@ -74,46 +74,91 @@
       return values;
     };
 
+    PuzzleUi.prototype.set = function(row, col, num, cssclass) {
+      var $col, $input, $row, $span;
+      if (cssclass == null) {
+        cssclass = null;
+      }
+      $row = $('#grid tr:nth-child(' + (row + 1) + ')');
+      $col = $($row).find('td:nth-child(' + (col + 1) + ')');
+      $span = $($col).find('span');
+      $input = $($col).find('input');
+      if ($span.text() === '') {
+        if (cssclass) {
+          $span.addClass(cssclass);
+        }
+        $span.text(num);
+        $input.val(num);
+        if (cssclass) {
+          return $col.effect('highlight', {}, 1500);
+        }
+      }
+    };
+
+    PuzzleUi.prototype.clear_board = function() {
+      $('#grid td input').val('');
+      $('#grid td span').text('');
+      return $('#grid td span').removeClass('solved');
+    };
+
     PuzzleUi.prototype.pushSolution = function(result) {
-      return $.each(result, function(rowIndex, rowSolution) {
-        var $tr;
-        $tr = $('#grid tr:nth-child(' + (rowIndex + 1) + ')');
-        return $.each(result[rowIndex], function(colIndex, cellValue) {
-          var $input, $span, $td, value;
-          $td = $($tr).find('td:nth-child(' + (colIndex + 1) + ')');
-          $span = $($td).find('span');
-          $input = $($td).find('input');
-          value = $span.text();
-          if (value === '') {
-            $span.text(cellValue);
-            $span.addClass('solved');
-            return $input.val(cellValue);
+      var col, colIndex, cssclass, row, rowIndex, value, _i, _j, _len, _len1, _results;
+      $('#grid td span').removeClass('solved');
+      rowIndex = 0;
+      _results = [];
+      for (_i = 0, _len = result.length; _i < _len; _i++) {
+        row = result[_i];
+        colIndex = 0;
+        for (_j = 0, _len1 = row.length; _j < _len1; _j++) {
+          col = row[_j];
+          value = result[rowIndex][colIndex];
+          cssclass = 'solved' != null ? 'solved' : value > {
+            0: null
+          };
+          if (value) {
+            this.set(rowIndex, colIndex, value, cssclass);
           }
-        });
-      });
+          colIndex += 1;
+        }
+        _results.push(rowIndex += 1);
+      }
+      return _results;
     };
 
     PuzzleUi.prototype.presetBoard = function(puzzle) {
-      return $.each($('#grid tr'), function(rowIndex, rowPuzzle) {
-        return $.each($(rowPuzzle).find('td'), function(colIndex, cellPuzzle) {
-          var $input, $span, value;
+      var col, colIndex, row, rowIndex, value, _i, _j, _len, _len1, _results;
+      this.clear_board();
+      rowIndex = 0;
+      _results = [];
+      for (_i = 0, _len = puzzle.length; _i < _len; _i++) {
+        row = puzzle[_i];
+        colIndex = 0;
+        for (_j = 0, _len1 = row.length; _j < _len1; _j++) {
+          col = row[_j];
           value = puzzle[rowIndex][colIndex];
-          $input = $(cellPuzzle).find('input');
-          $span = $(cellPuzzle).find('span');
-          $span.removeClass('solved');
-          if (value > 0) {
-            $input.val(value);
-            return $span.text(puzzle[rowIndex][colIndex]);
-          } else {
-            $input.val('');
-            return $span.text('');
+          if (value) {
+            this.set(rowIndex, colIndex, value);
           }
-        });
-      });
+          colIndex += 1;
+        }
+        _results.push(rowIndex += 1);
+      }
+      return _results;
+    };
+
+    PuzzleUi.prototype.hide_alert = function() {
+      return $('#alert-panel').hide();
+    };
+
+    PuzzleUi.prototype.show_alert = function() {
+      return $('#alert-panel').show();
     };
 
     PuzzleUi.prototype.initializeBoard = function() {
       var _this = this;
+      $('#alert-panel .close').on('click', function() {
+        return _this.hide_alert();
+      });
       $('#grid').on('mouseenter', 'tr', function(e) {
         return _this.highlightRow($(e.currentTarget));
       });
@@ -137,17 +182,35 @@
         var gridValues, result, solver;
         e.preventDefault();
         gridValues = _this.extractGridValues();
-        solver = new SudokuSolver();
-        result = solver.solve(gridValues);
-        return _this.pushSolution(result);
+        solver = new SudokuSolver(gridValues);
+        if (solver.is_valid_puzzle()) {
+          result = solver.solve();
+          return _this.pushSolution(result);
+        } else {
+          return _this.show_alert();
+        }
       });
       $('#sample-btn').on('click', function(e) {
         e.preventDefault();
         return _this.presetBoard(_this.samplePuzzle);
       });
-      return $('#clear-btn').on('click', function(e) {
+      $('#clear-btn').on('click', function(e) {
         e.preventDefault();
         return _this.presetBoard(_this.emptyPuzzle);
+      });
+      return $('#hint-btn').on('click', function(e) {
+        var gridValues, hint, solver;
+        e.preventDefault();
+        gridValues = _this.extractGridValues();
+        solver = new SudokuSolver(gridValues);
+        if (solver.is_valid_puzzle()) {
+          hint = solver.get_hint();
+          if (hint) {
+            return _this.set(hint.row, hint.column, hint.value, 'solved');
+          }
+        } else {
+          return _this.show_alert();
+        }
       });
     };
 

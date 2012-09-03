@@ -3,10 +3,11 @@
 
   this.SudokuSolver = (function() {
 
-    function SudokuSolver() {
-      this.puzzle = [];
-      this.size = 0;
-      this.squareSize = 0;
+    function SudokuSolver(puzzle) {
+      this.puzzle = puzzle;
+      this.size = this.puzzle.length;
+      this.squareSize = Math.sqrt(this.puzzle.length);
+      this.hints = [];
     }
 
     SudokuSolver.prototype.solve_cell = function(row, col) {
@@ -30,20 +31,62 @@
       return false;
     };
 
-    SudokuSolver.prototype.solve = function(puzzle) {
-      this.puzzle = puzzle;
-      this.size = this.puzzle.length;
-      this.squareSize = Math.sqrt(this.size);
+    SudokuSolver.prototype.solve = function() {
+      this.attempts = 0;
+      this.hints = [[0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0]];
       this.solve_cell(0, 0);
       return this.puzzle;
     };
 
+    SudokuSolver.prototype.get_hint = function() {
+      var col, hint_array, hint_number, row, _i, _j, _ref, _ref1;
+      this.solve();
+      hint_array = [];
+      for (row = _i = 0, _ref = this.size - 1; 0 <= _ref ? _i <= _ref : _i >= _ref; row = 0 <= _ref ? ++_i : --_i) {
+        for (col = _j = 0, _ref1 = this.size - 1; 0 <= _ref1 ? _j <= _ref1 : _j >= _ref1; col = 0 <= _ref1 ? ++_j : --_j) {
+          if (this.hints[row][col] !== 0) {
+            hint_array.push({
+              row: row,
+              column: col,
+              value: this.hints[row][col]
+            });
+          }
+        }
+      }
+      if (hint_array.length > 0) {
+        hint_number = Math.floor((Math.random() * hint_array.length) + 1);
+        return hint_array[hint_number];
+      }
+      return null;
+    };
+
     SudokuSolver.prototype.set = function(row, col, num) {
-      return this.puzzle[row][col] = num;
+      if (this.attempts > 10000) {
+        throw "Invalid puzzle?";
+      } else {
+        this.attempts += 1;
+        this.puzzle[row][col] = num;
+        return this.hints[row][col] = num;
+      }
     };
 
     SudokuSolver.prototype.get = function(row, col) {
       return this.puzzle[row][col];
+    };
+
+    SudokuSolver.prototype.is_valid_puzzle = function() {
+      var col, row, value, _i, _j, _ref, _ref1;
+      for (row = _i = 0, _ref = this.size - 1; 0 <= _ref ? _i <= _ref : _i >= _ref; row = 0 <= _ref ? ++_i : --_i) {
+        for (col = _j = 0, _ref1 = this.size - 1; 0 <= _ref1 ? _j <= _ref1 : _j >= _ref1; col = 0 <= _ref1 ? ++_j : --_j) {
+          value = this.puzzle[row][col];
+          if (value > 0) {
+            if (!this.valid(row, col, value)) {
+              return false;
+            }
+          }
+        }
+      }
+      return true;
     };
 
     SudokuSolver.prototype.valid = function(row, col, num) {
@@ -76,9 +119,9 @@
       var c, c1, r, r1, _i, _j, _ref, _ref1;
       r1 = Math.floor(row / this.squareSize) * this.squareSize;
       c1 = Math.floor(col / this.squareSize) * this.squareSize;
-      for (r = _i = r1, _ref = r1 + this.squareSize - 1; r1 <= _ref ? _i <= _ref : _i >= _ref; r = r1 <= _ref ? ++_i : --_i) {
-        for (c = _j = c1, _ref1 = c1 + this.squareSize - 1; c1 <= _ref1 ? _j <= _ref1 : _j >= _ref1; c = c1 <= _ref1 ? ++_j : --_j) {
-          if (r !== row && c !== col && this.get(r, c) === num) {
+      for (r = _i = 0, _ref = this.squareSize - 1; 0 <= _ref ? _i <= _ref : _i >= _ref; r = 0 <= _ref ? ++_i : --_i) {
+        for (c = _j = 0, _ref1 = this.squareSize - 1; 0 <= _ref1 ? _j <= _ref1 : _j >= _ref1; c = 0 <= _ref1 ? ++_j : --_j) {
+          if ((r1 + r) !== row && (c1 + c) !== col && this.get(r1 + r, c1 + c) === num) {
             return false;
           }
         }
