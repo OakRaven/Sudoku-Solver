@@ -61,13 +61,8 @@
     };
 
     SudokuSolver.prototype.set = function(row, col, num) {
-      if (this.attempts > 10000) {
-        throw "Invalid puzzle?";
-      } else {
-        this.attempts += 1;
-        this.puzzle[row][col] = num;
-        return this.hints[row][col] = num;
-      }
+      this.puzzle[row][col] = num;
+      return this.hints[row][col] = num;
     };
 
     SudokuSolver.prototype.get = function(row, col) {

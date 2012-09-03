@@ -6,7 +6,7 @@
 }
 div#grid {
   margin-top: 2em;
-  width: 450px;
+  width: 405px;
   margin-left: auto;
   margin-right: auto;
 }
@@ -16,8 +16,8 @@ div#grid table {
 div#grid table td {
   text-align: center;
   vertical-align: center;
-  width: 50px;
-  height: 50px;
+  width: 45px;
+  height: 45px;
   border: 1px solid #b3b3b3;
   cursor: pointer;
 }

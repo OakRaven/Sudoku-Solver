@@ -63,13 +63,8 @@ class @SudokuSolver
     return null
 
   set: (row, col, num) ->
-    if @attempts > 10000
-      throw "Invalid puzzle?"
-    
-    else 
-      @attempts += 1
-      @puzzle[row][col] = num
-      @hints[row][col] = num
+    @puzzle[row][col] = num
+    @hints[row][col] = num
 
   get: (row, col) ->
     @puzzle[row][col]

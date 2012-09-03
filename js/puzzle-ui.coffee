@@ -1,4 +1,11 @@
 # puzzle-ui.coffee
+ARROWS = {
+  UP: 38
+  DOWN: 40
+  LEFT: 37
+  RIGHT: 39
+}
+
 class @PuzzleUi
 
   constructor: ->
@@ -31,20 +38,17 @@ class @PuzzleUi
       ]
 
 
-  highlightRow: (row) ->
-    $(@currentlySelectedRow).removeClass 'highlight' if @currentlySelectedRow
-    $(row).addClass 'highlight'
+  highlight: (cell) ->
+    @unhighlight()
+
+    row = $(cell).data 'row'
+    col = $(cell).data 'col'
+
+    $('#grid tr:nth-child(' + row + ') td').addClass 'highlight'
+    $('#grid tr td:nth-child(' + col + ')').addClass 'highlight'
+    
     @currentlySelectedRow = row
-
-
-  highlightColumn: (col) ->
-    if @currentlySelectedCol
-      $('#grid tr td:nth-child(' + @currentlySelectedCol + ')').removeClass 'highlight'
-
-    column = $(col).index() + 1
-
-    $('#grid tr td:nth-child(' + (column) + ')').addClass 'highlight'
-    @currentlySelectedCol  = column
+    @currentlySelectedCol = col
 
 
   hideEdit: (cell) ->
@@ -67,11 +71,7 @@ class @PuzzleUi
     if @currentlySelectedCell
       @hideEdit @currentlySelectedCell
 
-    if @currentlySelectedCol
-      $('#grid tr td:nth-child(' + @currentlySelectedCol + ')').removeClass 'highlight'
-
-    if @currentlySelectedRow
-      $(@currentlySelectedRow).removeClass 'highlight' 
+    $('#grid tr td').removeClass 'highlight'
 
 
   extractGridValues: ->
@@ -134,6 +134,32 @@ class @PuzzleUi
       rowIndex += 1
 
 
+  move_selection: (direction) ->
+    if @currentlySelectedCell
+      cRow = $(@currentlySelectedCell).data 'row'
+      cCol = $(@currentlySelectedCell).data 'col'
+
+      if direction is ARROWS.DOWN
+        cRow += 1
+        cRow = 1 if cRow > 9
+
+      if direction is ARROWS.UP
+        cRow -= 1
+        cRow = 9 if cRow < 1
+
+      if direction is ARROWS.RIGHT
+        cCol += 1
+        cCol = 1 if cCol > 9
+
+      if direction is ARROWS.LEFT
+        cCol -= 1
+        cCol = 9 if cCol < 1
+
+      $td = $('#grid tr:nth-child(' + cRow + ')').find('td:nth-child(' + cCol + ')')
+      @highlight $td
+      $td.click()
+
+
   hide_alert: ->
     $('#alert-panel').hide()
 
@@ -146,11 +172,8 @@ class @PuzzleUi
     $('#alert-panel .close').on 'click', =>
       @hide_alert()
 
-    $('#grid').on 'mouseenter', 'tr', (e) =>
-      @highlightRow $(e.currentTarget)
-
     $('#grid').on 'mouseenter', 'td', (e) =>
-      @highlightColumn $(e.currentTarget)
+      @highlight $(e.currentTarget)
 
     $('#grid').on 'click', 'td', (e) =>
       @displayEdit $(e.currentTarget)
@@ -191,4 +214,8 @@ class @PuzzleUi
       else
         @show_alert()
 
+    $('#grid').on 'keydown', 'input', (e) =>
+      key = e.keyCode
+      if key is ARROWS.UP or key is ARROWS.DOWN or key is ARROWS.LEFT or key is ARROWS.RIGHT
+        @move_selection(key)
 
