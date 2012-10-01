@@ -37,6 +37,17 @@ class @PuzzleUi
       [0,0,0,0,0,0,0,0,0]
       ]
 
+  buildTable: ->
+    tableHtml = ""
+    for row in [1..9]
+      tableHtml += "<tr>"
+      for col in [1..9]
+        tableHtml += "<td data-row=\"#{row}\" data-col=\"#{col}\"><input type=\"text\" maxlength=\"1\" value=\"\"><span></span></td>"
+
+      tableHtml += "</tr>"
+
+    $('#grid table').append tableHtml
+
 
   highlight: (cell) ->
     @unhighlight()
@@ -157,7 +168,7 @@ class @PuzzleUi
 
       $td = $('#grid tr:nth-child(' + cRow + ')').find('td:nth-child(' + cCol + ')')
       @highlight $td
-      $td.click()
+      @displayEdit $td
 
 
   hide_alert: ->
@@ -169,6 +180,8 @@ class @PuzzleUi
 
 
   initializeBoard: ->
+    @buildTable()
+
     $('#alert-panel .close').on 'click', =>
       @hide_alert()
 
@@ -217,5 +230,6 @@ class @PuzzleUi
     $('#grid').on 'keydown', 'input', (e) =>
       key = e.keyCode
       if key is ARROWS.UP or key is ARROWS.DOWN or key is ARROWS.LEFT or key is ARROWS.RIGHT
+        e.preventDefault()
         @move_selection(key)
 
